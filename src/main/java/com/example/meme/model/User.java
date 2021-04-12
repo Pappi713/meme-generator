@@ -1,5 +1,6 @@
 package com.example.meme.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class User {
   @Id
   @Column(unique = true)
   private String username;
+  @JsonIgnore
   private String password;
 
   @JsonManagedReference
