@@ -39,6 +39,4 @@ public class Meme {
   @JsonBackReference
   private User user;
 
-
-
 }
