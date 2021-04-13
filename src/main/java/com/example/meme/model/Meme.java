@@ -13,7 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -28,6 +30,10 @@ public class Meme {
   private String name;
   private String url;
   private String taglist;
+  private Boolean isOnFeed =false;
+
+  @Transient
+  private Map<String, Integer> voteCounter;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "id", referencedColumnName = "id")
