@@ -11,4 +11,14 @@ public class ApiExceptionHandler {
   public ResponseEntity handleUserAlreadyExistsException() {
     return ResponseEntity.status(422).build();
   }
+
+  @ExceptionHandler (value = MemeNotFoundException.class)
+  public ResponseEntity handleMemeNotFoundException() {
+    return ResponseEntity.status(400).build();
+  }
+
+  @ExceptionHandler (value = NoAuthorityException.class)
+  public ResponseEntity handleNoAuthorityException() {
+    return ResponseEntity.status(403).build();
+  }
 }
