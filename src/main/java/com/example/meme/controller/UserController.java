@@ -2,24 +2,39 @@ package com.example.meme.controller;
 
 import com.example.meme.dto.LoginDTO;
 import com.example.meme.dto.LoginResponseDTO;
+import com.example.meme.dto.MemeResponseDTO;
+import com.example.meme.dto.ResponseDTO;
+import com.example.meme.exception.MemeNotFoundException;
+import com.example.meme.exception.NoAuthorityException;
 import com.example.meme.exception.UserAlreadyExistsException;
+import com.example.meme.exception.UserNotFoundException;
 import com.example.meme.security.JwtUtil;
+import com.example.meme.service.MemeService;
 import com.example.meme.service.MyUserDetailsService;
 import com.example.meme.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 public class UserController {
   private final UserService userService;
+  private final MemeService memeService;
   private final AuthenticationManager authenticationManager;
   private final MyUserDetailsService myUserDetailsService;
   private final JwtUtil jwtUtil;
@@ -27,18 +42,20 @@ public class UserController {
   @Autowired
   public UserController(UserService userService,
                         AuthenticationManager authenticationManager,
-                        MyUserDetailsService myUserDetailsService, JwtUtil jwtUtil) {
+                        MyUserDetailsService myUserDetailsService, JwtUtil jwtUtil, MemeService memeService) {
     this.userService = userService;
     this.authenticationManager = authenticationManager;
     this.myUserDetailsService = myUserDetailsService;
     this.jwtUtil = jwtUtil;
+    this.memeService =memeService;
   }
 
   @PostMapping("/register")
   @ResponseBody
-  public ResponseEntity register(@RequestBody LoginDTO loginDTO) throws UserAlreadyExistsException {
+  public ResponseEntity<?> register(@RequestBody LoginDTO loginDTO) throws UserAlreadyExistsException {
     userService.createUser(loginDTO);
-    return ResponseEntity.ok().build();
+    ResponseDTO dto = new ResponseDTO("registration successful");
+    return ResponseEntity.ok(dto);
   }
 
   @PostMapping("/login")
@@ -56,5 +73,20 @@ public class UserController {
     final String jwt = jwtUtil.generateToken(userDetails);
     LoginResponseDTO response = new LoginResponseDTO(jwt);
     return ResponseEntity.ok(response);
+  }
+
+  @PutMapping("/feed/{id}")
+  @ResponseBody
+  public ResponseEntity setFeedFlagTrue(@PathVariable Long id, Principal principal)
+      throws UserAlreadyExistsException, UserNotFoundException, NoAuthorityException, MemeNotFoundException {
+    return ResponseEntity.ok().body(memeService.updateIsOnFeedTag(principal,id));
+  }
+
+  @GetMapping("/feed")
+  public ResponseEntity<List<MemeResponseDTO>> getFeed(@RequestParam(required = false) Integer page) {
+    if(page == null){
+      return ResponseEntity.ok(memeService.getFeed(1));
+    }
+    return ResponseEntity.ok(memeService.getFeed(page));
   }
 }
