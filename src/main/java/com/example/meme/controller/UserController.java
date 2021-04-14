@@ -2,6 +2,8 @@ package com.example.meme.controller;
 
 import com.example.meme.dto.LoginDTO;
 import com.example.meme.dto.LoginResponseDTO;
+import com.example.meme.dto.MemeResponseDTO;
+import com.example.meme.dto.ResponseDTO;
 import com.example.meme.exception.MemeNotFoundException;
 import com.example.meme.exception.NoAuthorityException;
 import com.example.meme.exception.UserAlreadyExistsException;
@@ -10,7 +12,7 @@ import com.example.meme.security.JwtUtil;
 import com.example.meme.service.MemeService;
 import com.example.meme.service.MyUserDetailsService;
 import com.example.meme.service.UserService;
-import org.apache.logging.log4j.message.StringFormattedMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,10 +24,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -48,9 +52,10 @@ public class UserController {
 
   @PostMapping("/register")
   @ResponseBody
-  public ResponseEntity register(@RequestBody LoginDTO loginDTO) throws UserAlreadyExistsException {
+  public ResponseEntity<?> register(@RequestBody LoginDTO loginDTO) throws UserAlreadyExistsException {
     userService.createUser(loginDTO);
-    return ResponseEntity.ok().build();
+    ResponseDTO dto = new ResponseDTO("registration successful");
+    return ResponseEntity.ok(dto);
   }
 
   @PostMapping("/login")
@@ -75,5 +80,13 @@ public class UserController {
   public ResponseEntity setFeedFlagTrue(@PathVariable Long id, Principal principal)
       throws UserAlreadyExistsException, UserNotFoundException, NoAuthorityException, MemeNotFoundException {
     return ResponseEntity.ok().body(memeService.updateIsOnFeedTag(principal,id));
+  }
+
+  @GetMapping("/feed")
+  public ResponseEntity<List<MemeResponseDTO>> getFeed(@RequestParam(required = false) Integer page) {
+    if(page == null){
+      return ResponseEntity.ok(memeService.getFeed(1));
+    }
+    return ResponseEntity.ok(memeService.getFeed(page));
   }
 }

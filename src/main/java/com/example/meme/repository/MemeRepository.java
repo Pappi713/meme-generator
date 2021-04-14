@@ -1,7 +1,15 @@
 package com.example.meme.repository;
 
 import com.example.meme.model.Meme;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
-public interface MemeRepository extends CrudRepository<Meme, Long> {
+import java.util.List;
+
+@Repository
+public interface MemeRepository extends PagingAndSortingRepository<Meme, Long> {
+
+  List<Meme> findAllByIsOnFeed(Boolean isOnFeed, Pageable pageable);
+  List<Meme> findAll();
 }
