@@ -1,5 +1,7 @@
 package com.example.meme.controller;
 
+import com.example.meme.dto.CreateMemeRequestDTO;
+import com.example.meme.dto.CreateMemeResponseDTO;
 import com.example.meme.dto.LoginDTO;
 import com.example.meme.dto.LoginResponseDTO;
 import com.example.meme.dto.MemeResponseDTO;
@@ -12,7 +14,6 @@ import com.example.meme.security.JwtUtil;
 import com.example.meme.service.MemeService;
 import com.example.meme.service.MyUserDetailsService;
 import com.example.meme.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -83,10 +84,19 @@ public class UserController {
   }
 
   @GetMapping("/feed")
-  public ResponseEntity<List<MemeResponseDTO>> getFeed(@RequestParam(required = false) Integer page) {
-    if(page == null){
-      return ResponseEntity.ok(memeService.getFeed(1));
+  public ResponseEntity<?> getFeed(@RequestParam(required = false) Integer page) {
+    if (page == null) {
+      List<MemeResponseDTO> memeResponseDTOList = memeService.getFeed(1);
+      return ResponseEntity.ok(memeResponseDTOList);
     }
     return ResponseEntity.ok(memeService.getFeed(page));
+  }
+
+  @PostMapping("/create")
+  @ResponseBody
+  public ResponseEntity<?> createMeme(@RequestBody CreateMemeRequestDTO createMemeRequestDTO, Principal principal)
+      throws UserNotFoundException {
+    CreateMemeResponseDTO createMemeResponseDTO = memeService.createMeme(principal,createMemeRequestDTO);
+    return ResponseEntity.ok().body(createMemeResponseDTO);
   }
 }

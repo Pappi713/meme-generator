@@ -27,7 +27,7 @@ public class MemeResponseDTO {
     Map<String, Integer> result = new HashMap<>();
     for(Reaction reaction : reactions){
       if(result.containsKey(reaction.getType())){
-        result.put(reaction.getType(), result.get(reaction) + 1);
+        result.put(reaction.getType(), result.get(reaction.getType()) + 1);
         continue;
       }
       result.put(reaction.getType(), 1);
