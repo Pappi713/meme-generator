@@ -28,13 +28,10 @@ public class User {
   @JsonIgnore
   private String password;
 
-  @JsonManagedReference
+
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Meme> memeList;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "id", referencedColumnName = "id")
-  private Reaction reaction;
 
   public User(String username) {
     this.username = username;
