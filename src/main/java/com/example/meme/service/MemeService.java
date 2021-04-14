@@ -101,4 +101,19 @@ public class MemeService {
 
     return new CreateMemeResponseDTO(meme.getId(),meme.getName(),meme.getUrl());
   }
+
+  public List<MemeResponseDTO> getAllNotOnFeed(Principal principal) throws UserNotFoundException {
+    Optional<User> optionalUser = userRepository.findById(principal.getName());
+    if(!optionalUser.isPresent()) {
+      throw new UserNotFoundException("No such user");
+    }
+    List<MemeResponseDTO> memeList =  optionalUser
+        .get()
+        .getMemeList()
+        .stream()
+        .filter(i -> !i.getIsOnFeed())
+        .map(i -> new MemeResponseDTO(i.getId(), i.getName(), i.getUrl(), i.getReactionList()))
+        .collect(Collectors.toList());
+    return memeList;
+  }
 }

@@ -11,5 +11,6 @@ import java.util.List;
 public interface MemeRepository extends PagingAndSortingRepository<Meme, Long> {
 
   List<Meme> findAllByIsOnFeed(Boolean isOnFeed, Pageable pageable);
+  List<Meme> findAllByIsOnFeed(Boolean isOnFeed);
   List<Meme> findAll();
 }

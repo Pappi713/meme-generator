@@ -99,4 +99,9 @@ public class UserController {
     CreateMemeResponseDTO createMemeResponseDTO = memeService.createMeme(principal,createMemeRequestDTO);
     return ResponseEntity.ok().body(createMemeResponseDTO);
   }
+
+  @GetMapping("/meme")
+  public ResponseEntity<List<MemeResponseDTO>> getMemesNotOnFeed(Principal principal) throws UserNotFoundException {
+    return ResponseEntity.ok(memeService.getAllNotOnFeed(principal));
+  }
 }
