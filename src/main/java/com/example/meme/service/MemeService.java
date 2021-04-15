@@ -12,6 +12,7 @@ import com.example.meme.model.User;
 import com.example.meme.repository.MemeRepository;
 import com.example.meme.repository.ReactionRepository;
 import com.example.meme.repository.UserRepository;
+import org.graalvm.compiler.lir.LIRInstruction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -115,5 +116,23 @@ public class MemeService {
         .map(i -> new MemeResponseDTO(i.getId(), i.getName(), i.getUrl(), i.getReactionList()))
         .collect(Collectors.toList());
     return memeList;
+  }
+
+  public MemeResponseDTO react(List<String> emotions, Long id) throws MemeNotFoundException {
+    Optional<Meme> optionalMeme = memeRepository.findById(id);
+    if (!optionalMeme.isPresent()) {
+      throw new MemeNotFoundException("Meme does not exist with the given id");
+    }
+    Meme meme = optionalMeme.get();
+    List<Reaction> reactions = emotions.stream().map(i -> new Reaction(i, meme)).collect(Collectors.toList());
+    for(Reaction reaction : reactions) {
+      reactionRepository.save(reaction);
+    }
+    meme.getReactionList().addAll(reactions);
+    Meme savedMeme = memeRepository.save(meme);
+    return new MemeResponseDTO(meme.getId(),
+        savedMeme.getName(),
+        savedMeme.getUrl(),
+        savedMeme.getReactionList());
   }
 }
