@@ -104,4 +104,10 @@ public class UserController {
   public ResponseEntity<List<MemeResponseDTO>> getMemesNotOnFeed(Principal principal) throws UserNotFoundException {
     return ResponseEntity.ok(memeService.getAllNotOnFeed(principal));
   }
+
+  @PostMapping("/react/{id}")
+  public ResponseEntity<MemeResponseDTO> addReaction(@RequestBody List<String> emotions,
+                                                     @PathVariable Long id) throws MemeNotFoundException {
+    return ResponseEntity.ok(memeService.react(emotions, id));
+  }
 }
